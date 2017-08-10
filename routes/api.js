@@ -4,18 +4,22 @@ const db = require( '../app' );
 module.exports = ( router ) => {
 
   router.use( cors({
-    origin: ['http://localhost:3001'],
+    origin: ['http://localhost:3000'],
     credentials: true
   }));
 
-  router.get( '/lessons', ( req, res ) => {
-    db.any( 'SELECT * from lessons' )
+  router.get( '/emails/:userId', ( req, res ) => {
+    const userId = req.params.userId;
+    console.log('User ID is:', userId);
+
+    db.any( `SELECT * from emails WHERE "recipientId"=${ userId }` )
       .then( posts => {
         return posts
           ? res.status( 200 ).json( posts )
           : res.status( 403 ).send
       })
       .catch( err => {
+        console.log(err)
         return res.status( 500 ).send();
       })
   });

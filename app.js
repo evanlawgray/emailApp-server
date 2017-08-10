@@ -8,7 +8,7 @@ const json = bodyParser.json;
 const db = pgp({
   host: 'localhost',
   port: '5432',
-  database: 'practice',
+  database: 'emailclient',
   user: 'owner',
   password: 'Atarax1a309'
 });
@@ -30,7 +30,7 @@ app.use( bodyParser.urlencoded({ extended: false }) ) ;
 
 app.use( '/api', apiRoutes( apiRouter ) );
 
-const PORT = 3000;
+const PORT = 3001;
 
 app.listen( PORT, err => {
   err && console.log( `Error: ${err}. Failed to connect to server` );
