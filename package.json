@@ -11,9 +11,11 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.17.2",
+    "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "express": "^4.15.4",
     "json": "^9.0.6",
+    "jsonwebtoken": "^7.4.3",
     "pg-promise": "^6.3.7"
   }
 }
