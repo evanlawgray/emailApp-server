@@ -29,5 +29,23 @@ module.exports = function( router ) {
       });
   });
 
+  router.post( '/signup', ( req, res ) => {
+    const {username, email, password} = req.body;
+
+    db.any( `SELECT * FROM users WHERE email='${email}' AND password=crypt('${password}', password);` )
+      .then( users => {
+        if( users.length ) {
+          res.status(403).send('The submitted username or password already exists. Please try again.');
+        } else {
+          db.any( `INSERT INTO users (username, email, password) VALUES ('${username}', '${email}', crypt('${password}', gen_salt('bf', 8)));` )
+            .then( ( ) => res.status(200).send('Your user account has been created') )
+            .catch( error => {
+              console.log( 'The error is:', error );
+              res.status(500).send('There was a problem creating your account. Please try again later.');
+            });
+        }
+      }).catch( error => res.status(500).send('error') );
+  });
+
   return router;
 }
