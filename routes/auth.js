@@ -6,7 +6,6 @@ module.exports = function( router ) {
 
   router.post( '/login', (req, res) => {
     const {email, password} = req.body;
-    console.log(email, password);
 
     db.any( `SELECT * FROM users WHERE email='${email}' AND password=crypt('${password}', password);` )
       .then( users => {
@@ -17,7 +16,7 @@ module.exports = function( router ) {
 
           const JWT = jwt.sign(session, '2l3k45j8a-a-0iga', {expiresIn: '2hr'});
 
-          res.status(200).cookie('redit_session', JWT, {
+          res.status(200).cookie('email_session', JWT, {
             secure: false,
             maxAge: 7200000,
             httpOnly: true

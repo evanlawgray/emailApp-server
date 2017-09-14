@@ -9,8 +9,7 @@ module.exports = ( router ) => {
   }));
 
   router.get( '/emails/:userId', ( req, res ) => {
-    const userId = req.params.userId;
-    console.log('User ID is:', userId);
+    const { userId } = req.params;
 
     db.any( `SELECT * from emails WHERE "recipientId"=${ userId }` )
       .then( posts => {
