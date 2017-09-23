@@ -18,10 +18,45 @@ module.exports = ( router ) => {
           : res.status( 403 ).send
       })
       .catch( err => {
-        console.log(err)
         return res.status( 500 ).send();
       })
   });
+
+  router.post( '/sendEmail', ( req, res ) => {
+    const { userId, recipient, subject, message } = req.body;
+
+    let messageData = {
+      recipient: recipient,
+      subject: subject,
+      message: message,
+      authorId: userId,
+    }
+
+    db.any( `SELECT * FROM users WHERE "id"=${ userId };` )
+      .then( userInfo => {
+        if( !userInfo.length ) res.status( 403 ).send('There was an error loading your account information. Please log out then try again after signing in.');
+
+        messageData.author = userInfo[0].username;
+        return messageData;
+      }).then ( messageData => {
+          db.any( `SELECT * FROM users WHERE "username"='${ recipient }';` )
+            .then( recipientInfo => {
+              if( !recipientInfo.length ) res.status( 400 ).send( 'Your message could not be delivered because the recipient you identified does not have an account.' );
+
+              messageData.recipientId = recipientInfo[0].id;
+              return messageData;
+            }).then( messageData => {
+                db.any( `INSERT INTO emails ( author, recipient, subject, message, "authorId", "recipientId" )
+                  VALUES ( '${ messageData.author }', '${ messageData.recipient }', '${ messageData.subject }', '${ messageData.message }', '${ messageData.authorId }', '${ messageData.recipientId }' );` )
+                  .then( () => res.status( 200 ).send( 'Your message has been sent!' ) )
+                  .catch( error => res.status( 500 ).send( 'Thanks! Your message was sent successfully!' ))
+            }).catch( error => {
+              res.status( 500 ).send( 'Failed to fetch recipient info...' );
+            })
+      }).catch( error => {
+        res.status( 500 ).send( 'Failed to fetch your account information...' );
+      });
+  })
 
   return router;
 }
