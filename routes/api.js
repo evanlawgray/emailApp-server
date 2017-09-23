@@ -36,25 +36,34 @@ module.exports = ( router ) => {
       .then( userInfo => {
         if( !userInfo.length ) res.status( 403 ).send('There was an error loading your account information. Please log out then try again after signing in.');
 
-        messageData.author = userInfo[0].username;
+        if( userInfo[0] ) {
+          messageData.author = userInfo[0].username;
+        } else {
+          throw Error;
+        }
         return messageData;
       }).then ( messageData => {
           db.any( `SELECT * FROM users WHERE "username"='${ recipient }';` )
             .then( recipientInfo => {
               if( !recipientInfo.length ) res.status( 400 ).send( 'Your message could not be delivered because the recipient you identified does not have an account.' );
 
-              messageData.recipientId = recipientInfo[0].id;
+              if( recipientInfo[0] ) {
+                messageData.recipientId = recipientInfo[0].id
+              } else {
+                throw Error;
+              }
+
               return messageData;
             }).then( messageData => {
                 db.any( `INSERT INTO emails ( author, recipient, subject, message, "authorId", "recipientId" )
                   VALUES ( '${ messageData.author }', '${ messageData.recipient }', '${ messageData.subject }', '${ messageData.message }', '${ messageData.authorId }', '${ messageData.recipientId }' );` )
                   .then( () => res.status( 200 ).send( 'Your message has been sent!' ) )
-                  .catch( error => res.status( 500 ).send( 'Thanks! Your message was sent successfully!' ))
+                  .catch( error => console.log('INSERT ERROR:', error))
             }).catch( error => {
-              res.status( 500 ).send( 'Failed to fetch recipient info...' );
+              console.log('FETCH RECIPIENT ERROR:', error);
             })
       }).catch( error => {
-        res.status( 500 ).send( 'Failed to fetch your account information...' );
+        console.log('FETCH AUTHOR ID ERROR', error);
       });
   })
 
