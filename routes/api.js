@@ -11,8 +11,9 @@ module.exports = ( router ) => {
   router.get( '/emails/:userId', ( req, res ) => {
     const { userId } = req.params;
 
-    db.any( `SELECT * from emails WHERE "recipientId"=${ userId }` )
-      .then( posts => {
+    db.any( `SELECT * from emails WHERE "recipientId"=${ userId } ORDER BY id DESC` )
+      .then( results => {
+        const posts = results.slice(0);
         return posts
           ? res.status( 200 ).json( posts )
           : res.status( 403 ).send
@@ -65,6 +66,20 @@ module.exports = ( router ) => {
       }).catch( error => {
         console.log('FETCH AUTHOR ID ERROR', error);
       });
+  })
+
+  router.post( '/updateImportance', ( req, res ) => {
+    const { messageId } = req.body;
+
+    db.any( `UPDATE emails
+      SET isimportant = NOT isimportant
+      WHERE id = ${ messageId }` )
+      .then( () => res.status( 200 ).send( 'Message was updated successfully' ) )
+      .catch( error => {
+        console.log( 'MARK AS IMPORTANT ERROR:', error );
+
+        res.status( 500 ).send( 'Something went wrong...Please try again' )
+      })
   })
 
   return router;
