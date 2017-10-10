@@ -76,10 +76,22 @@ module.exports = ( router ) => {
       WHERE id = ${ messageId }` )
       .then( () => res.status( 200 ).send( 'Message was updated successfully' ) )
       .catch( error => {
-        console.log( 'MARK AS IMPORTANT ERROR:', error );
+        console.log( 'MARK AS IMPORTANT ERROR: ', error );
 
-        res.status( 500 ).send( 'Something went wrong...Please try again' )
+        res.status( 500 ).send( 'Something went wrong...Please try again' );
       })
+  })
+
+  router.post( '/deleteEmail', ( req, res ) => {
+    const { messageId } = req.body;
+
+    db.any( `DELETE FROM emails WHERE id=${ messageId }` )
+      .then( () => res.status( 200 ).send( 'The message was deleted successfully' ) )
+      .catch( error => {
+        console.log( 'DELTE EMAIL ERROR: ', error );
+
+        res.status( 500 ).send( 'Something went wrong...Please try again' );
+      });
   })
 
   return router;
