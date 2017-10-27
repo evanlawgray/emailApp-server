@@ -18,8 +18,7 @@ module.exports = function( router ) {
 
           res.status(200).cookie('email_session', JWT, {
             secure: false,
-            maxAge: 7200000,
-            httpOnly: true
+            maxAge: 7200000
           }).send(`${users[0].id}`);
         } else { res.status(403).send('Invalid username or password...') }
       }).catch( error => {

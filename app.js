@@ -36,7 +36,7 @@ const authRoutes = require( './routes/auth' );
 
 app.use( json() );
 app.use( bodyParser.urlencoded({ extended: false }) ) ;
-app.use(cookieParser());
+app.use( cookieParser() );
 
 app.use( '/api', apiRoutes( apiRouter ));
 app.use( '/auth', authRoutes( authRouter ));
