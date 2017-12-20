@@ -1,12 +1,10 @@
 const cors = require( 'cors' );
 const db = require( '../app' );
+const cookieParser = require('cookie-parser');
 
 module.exports = ( router ) => {
 
-  router.use( cors({
-    origin: ['http://localhost:3000'],
-    credentials: true
-  }));
+  router.use( cookieParser() );
 
   router.get( '/emails/:userId', ( req, res ) => {
     if( req.cookies.email_session ) {

@@ -16,10 +16,19 @@ module.exports = function( router ) {
 
           const JWT = jwt.sign(session, '2l3k45j8a-a-0iga', {expiresIn: '2hr'});
 
-          res.status(200).cookie('email_session', JWT, {
+          // Set session cookie and user_id cookie so the client
+          // knows whose emails to fetch when user re-opens app
+          // after closing / navigating away in browser.
+          res.cookie('email_session', JWT, {
             secure: false,
             maxAge: 7200000
-          }).send(`${users[0].id}`);
+          });
+          res.cookie('user_id', users[0].id, {
+            secure: false,
+            maxAge: 7200000
+          });
+
+          res.status(200).send(`${users[0].id}`);
         } else { res.status(403).send('Invalid username or password...') }
       }).catch( error => {
         console.log(error);
